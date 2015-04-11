@@ -1,0 +1,21 @@
+CXX = c++
+CC = c++
+CPPFLAGS = -std=c++11 -Wno-implicit-exception-spec-mismatch
+all: example test-tmalloc test-datastruct 
+
+clean:
+	rm *.o test-tmalloc test-datastruct
+
+test-tmalloc: test-tmalloc.o tmalloc.o
+	c++ -o $@ $^
+
+test-datastruct: test-datastruct.o os.o
+	c++ -o $@ $^ -lpthread
+
+test-datastruct.o: test-datastruct.cpp datastruct.h datastructmt.h
+
+os.o: os.cpp os-linux.cpp os-mac.cpp os-windows.cpp
+
+test-tmalloc.o: test-tmalloc.cpp tmalloc.h
+
+tmalloc.o: tmalloc.cpp datastruct.h
