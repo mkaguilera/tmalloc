@@ -7,3 +7,5 @@ To use, simply include
 in your source file and then link your program with tmalloc.o
 
 For an example, see example.cpp. The makefile will build it.
+
+Note: the code has not been tested well in Windows
