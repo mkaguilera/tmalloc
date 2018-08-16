@@ -82,6 +82,12 @@ void *_tmalloc(size_t size);
 void _tfree(void *buf);
 void *_trealloc(void *ptr, size_t size);
 size_t _tgetsize(void *buf);
+
+// original allocation functions
+void *orig_malloc(size_t size);
+void orig_free(void *buf);
+void *orig_realloc(void *ptr, size_t size);
+
 #define malloc _tmalloc
 #define free _tfree
 #define realloc _trealloc

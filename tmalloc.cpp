@@ -616,6 +616,18 @@ void *_trealloc(void *ptr, size_t size){
 }
 #endif
 
+void *orig_malloc(size_t size){
+  return malloc(size);
+}
+
+void orig_free(void *buf){
+  free(buf);
+}
+
+void *orig_realloc(void *ptr, size_t size){
+  return realloc(ptr, size);
+}
+
 #if defined(LINUX_NUMA) && defined(__linux__)
 _TMThreadInfo::_TMThreadInfo()
   : destMap(_TM_DESTMAP_HASHTABLE_SIZE), allocator((u64)this, 0,
