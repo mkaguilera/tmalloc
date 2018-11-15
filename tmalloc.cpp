@@ -46,7 +46,7 @@ Tlocal _TMThreadInfo *_TMthreadinfo=0;
 void FixedAllocator::addPadding(void *buf){
   PadBefore *padbefore = (PadBefore*) buf;
   PadAfter *padafter = (PadAfter*) ((char*) buf + sizeof(PadBefore) + Size);
-  padbefore->allocated=-1LL;
+  padbefore->allocated=(u64)-1LL;
   padbefore->tag = Tag;
   padbefore->status = 0;
   padbefore->next = 0;
@@ -60,8 +60,8 @@ void FixedAllocator::addPadding(void *buf){
 void FixedAllocator::checkPadding(void *buf, bool alloc){
   PadBefore *padbefore = (PadBefore*) buf;
   PadAfter *padafter = (PadAfter*) ((char*)buf + sizeof(PadBefore) + Size);
-  if (alloc) assert(padbefore->allocated != -1LL);
-  else assert(padbefore->allocated == -1LL);
+  if (alloc) assert(padbefore->allocated != (u64)-1LL);
+  else assert(padbefore->allocated == (u64)-1LL);
   //assert(padbefore->tag == Tag);
   assert(memcmp(padbefore->magic, PADBEFOREMAGIC, sizeof(padbefore->magic))==0);
   assert(memcmp(padafter->magic, PADAFTERMAGIC, sizeof(padafter->magic))==0);
@@ -118,7 +118,7 @@ FixedAllocator::~FixedAllocator(){
 void *FixedAllocator::alloc(u64 reqsize){
   PadBefore *pb;
 
-  if (reqsize==-1LL) reqsize = Size; // for bookkeeping purposes only, not
+  if (reqsize==(u64)-1LL) reqsize = Size; // for bookkeeping purposes only, not
                                      // really used
   else if (reqsize > Size) return 0; // size too large for fixed block
   FreeUnits_lock.lock();
@@ -141,7 +141,7 @@ void FixedAllocator::free(void *tofree){
   checkPadding(buf,true);
   FreeUnits_lock.lock();
   pb->next = FreeUnitsHead->next; // add block to beginning of linked list
-  pb->allocated = -1LL; // mark as not allocated
+  pb->allocated = (u64)-1LL; // mark as not allocated
   FreeUnitsHead->next = pb;  
   --NAllocated;
   FreeUnits_lock.unlock();
@@ -171,7 +171,7 @@ u32 FixedAllocator::getStatus(void *buf){
 void FixedAllocatorNolock::addPadding(void *buf){
   PadBefore *padbefore = (PadBefore*) buf;
   PadAfter *padafter = (PadAfter*) ((char*) buf + sizeof(PadBefore) + Size);
-  padbefore->allocated=-1LL;
+  padbefore->allocated=(u64)-1LL;
   padbefore->tag = Tag;
   padbefore->status = 0;
   padbefore->next = 0;
@@ -185,8 +185,8 @@ void FixedAllocatorNolock::addPadding(void *buf){
 void FixedAllocatorNolock::checkPadding(void *buf, bool alloc){
   PadBefore *padbefore = (PadBefore*) buf;
   PadAfter *padafter = (PadAfter*) ((char*) buf + sizeof(PadBefore) + Size);
-  if (alloc) assert(padbefore->allocated != -1LL);
-  else assert(padbefore->allocated == -1LL);
+  if (alloc) assert(padbefore->allocated != (u64)-1LL);
+  else assert(padbefore->allocated == (u64)-1LL);
   //assert(padbefore->tag == Tag);
   assert(memcmp(padbefore->magic, PADBEFOREMAGIC, sizeof(padbefore->magic))==0);
   assert(memcmp(padafter->magic, PADAFTERMAGIC, sizeof(padafter->magic))==0);
@@ -265,7 +265,7 @@ FixedAllocatorNolock::~FixedAllocatorNolock(){
 void *FixedAllocatorNolock::alloc(u64 reqsize){
   PadBefore *pb;
 
-  if (reqsize==-1LL) reqsize = Size; // for bookkeeping purposes only,
+  if (reqsize==(u64)-1LL) reqsize = Size; // for bookkeeping purposes only,
                                      // not really used
   else if (reqsize > Size) return 0; // size too large for fixed block
   if (FreeUnitsHead->next == FreeUnitsTail) // empty linked list
@@ -285,7 +285,7 @@ void FixedAllocatorNolock::free(void *tofree){
   PadBefore *pb = (PadBefore*) buf;
   assert((checkPadding(buf,true),1));
   pb->next = FreeUnitsHead->next; // add block to beginning of linked list
-  pb->allocated = -1LL; // mark as not allocated
+  pb->allocated = (u64)-1LL; // mark as not allocated
   FreeUnitsHead->next = pb;  
   --NAllocated;
   return;
@@ -382,7 +382,7 @@ void *VariableAllocatorNolock::alloc(size_t size){
 
 void VariableAllocatorNolock::free(void *ptr){
   size_t size = getSize(ptr);
-  assert(size != -1LL); // if size==-1LL then ptr has been freed already
+  assert(size != (size_t)-1LL); // if size==-1LL then ptr has been freed already
   int pool = ceillog2(size);
   pool -= VARALLOC_FIRSTPOOL;
   if (pool < 0) pool = 0;
@@ -396,7 +396,7 @@ u64 VariableAllocatorNolock::getTag(void *ptr){
 
 void VariableAllocatorNolock::checkBuf(void *buf, bool alloc){
   size_t size = FixedAllocatorNolock::getSize(buf);
-  assert(size != -1LL); // if size==-1LL then ptr has been freed already
+  assert(size != (size_t)-1LL); // if size==-1LL then ptr has been freed already
   int pool = ceillog2(size);
   pool -= VARALLOC_FIRSTPOOL;
   if (pool < 0) pool = 0;
@@ -515,9 +515,9 @@ static void _TMfreelist(){
 }
 
 void *operator new(size_t size){ return _tmalloc(size); }
-void operator delete(void *p){ _tfree(p); }
+void operator delete(void *p) noexcept { _tfree(p); }
 void *operator new[](size_t size){ return _tmalloc(size); }
-void operator delete[](void *p){ _tfree(p); }
+void operator delete[](void *p) noexcept { _tfree(p); }
 
 
 

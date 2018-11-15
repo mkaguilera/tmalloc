@@ -1,6 +1,6 @@
 CXX = c++
 CC = c++
-CPPFLAGS = -std=c++11 -Wno-implicit-exception-spec-mismatch
+CPPFLAGS = -std=c++11 -Wall
 
 example: example.o tmalloc.o
 

@@ -93,9 +93,9 @@ public:
   };
 
 private:
-  int Size;       // user requested size
-  int Realsize;   // size including padding before and after
-  int IncGrow;    // incremental number of units to grow when no more
+  u64 Size;       // user requested size
+  u64 Realsize;   // size including padding before and after
+  u64 IncGrow;    // incremental number of units to grow when no more
                   // units available
   int NAllocated; // number of units allocated
   u64 Tag;        // tag to be added at each allocated block
@@ -123,7 +123,7 @@ public:
   static size_t getSize(void *buf);
   int getNAllocated(void){ return NAllocated; }
   void grow(void){ grow(IncGrow); }
-  void *alloc(u64 reqsize=-1LL); // allocate new buffer. buffer will have fixed
+  void *alloc(u64 reqsize=(u64)-1LL); // allocate new buffer. buffer will have fixed
                                  // size. reqsize is written into header for
                                  // bookkeeping purposes only (not used).
   void free(void *buf); // free buffer
@@ -147,11 +147,11 @@ public:
   };
 
 private:
-  int Size;       // user requested size
-  int Realsize;   // size including padding before and after
-  int IncGrow;    // incremental number of units to grow when no more
+  u64 Size;       // user requested size
+  u64 Realsize;   // size including padding before and after
+  u64 IncGrow;    // incremental number of units to grow when no more
                   // units available
-  int NAllocated; // number of units allocated
+  u32 NAllocated; // number of units allocated
   u64 Tag;        // tag to be added at each allocated block
   void *(*PageAllocFunc)(size_t);
   unsigned PageSize;
@@ -188,7 +188,7 @@ public:
                                                   // block (must be <= Size)
   int getNAllocated(void){ return NAllocated; }
   void grow(void){ grow(IncGrow); }
-  void *alloc(u64 reqsize=-1LL); // allocate new buffer. buffer will have
+  void *alloc(u64 reqsize=(u64)-1LL); // allocate new buffer. buffer will have
                                  // fixed size. reqsize is written into header
                                  // for bookkeeping purposes only (not used).
   void free(void *buf); // free buffer
@@ -297,10 +297,10 @@ public:
 
 // thread-specific data
 struct _TMThreadInfo {
+  HashTable<void*,DestMapItem,_TMOrigAllocator> destMap;  
   VariableAllocatorNolock allocator;
   _TMLinkListNode *headLinkList;   // head of list of superbuffers to be freed
   // maps destination threads to their partially-filled superbuffers  
-  HashTable<void*,DestMapItem,_TMOrigAllocator> destMap;  
   // add a node to the linklist
   void addNode(_TMLinkListNode *node);
   _TMThreadInfo();

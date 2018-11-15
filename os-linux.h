@@ -132,6 +132,7 @@ public:
     int err;
     assert(initialValue >= 0);
     err = sem_init(&sem, 0, initialValue);
+    assert(!err);
   }
   
   // returns true if timeout expired, false if semaphore has been signaled
